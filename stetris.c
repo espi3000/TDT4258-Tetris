@@ -151,9 +151,11 @@ int readSenseHatJoystick() {
         .fd = eventfd,
         .events = POLLIN
     };
-    if (poll(&pollEvent, 1, 0)) {
-        read(eventfd, &event, sizeof(struct input_event)); // read event
-    }
+    if (!poll(&pollEvent, 1, 0))
+        return 0;
+    read(eventfd, &event, sizeof(struct input_event)); // read event
+    if (!event.value)                                  // ignore release events
+        return 0;
     return event.code;
 }
 
